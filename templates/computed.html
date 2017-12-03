@@ -1,0 +1,191 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Computed
+{% endblock %}
+
+{% block script %}
+
+	<script >
+		window.waypts =[];
+		window.start = "{{start}}";
+		window.end = "{{end}}";
+	</script>
+
+	{% for place in waypoints %}
+		<script >
+
+		window.waypts.push({
+	              location: "{{place}}",
+	              stopover: true
+	            });
+		</script>
+	{% endfor %}
+
+	<script src="{{ url_for('static', filename='computed.js') }}"></script>
+	<script async defer
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDGREkJd-9YSBkOMdurnw-0gKxMCN1r4_g&callback=initMap">
+	</script>
+{% endblock %}
+
+{% block main %}
+
+<body class="components-page">
+
+	<!-- Navbar -->
+	<nav class="navbar navbar-info navbar-transparent navbar-fixed-top navbar-color-on-scroll">
+		<div class="container">
+	        <div class="navbar-header" >
+	        	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-index">
+		        	<span class="sr-only">Toggle navigation</span>
+		        	<span class="icon-bar"></span>
+		        	<span class="icon-bar"></span>
+		        	<span class="icon-bar"></span>
+		    	</button>
+		    	<a href="http://www.facebook.com/jambay.k">
+		        	<div class="logo-container">
+		                <div class="logo">
+		                    <img src="{{ url_for('static', filename='logo.jpg') }}" class="img-circle" rel="tooltip" title="<b>Let's Go</b> by Jambay. The web design template is courtesy of <b>Creative Tim</b>" data-placement="bottom" data-html="true">
+		                </div>
+		                <div class="brand">
+		                    Jambay Kinley
+		                </div>
+		         
+					</div>
+		      	</a>
+		    </div>
+
+		    <div class="collapse navbar-collapse" id="navigation-index">
+		    	<ul class="nav navbar-nav navbar-right">
+					<li>
+						<a style="cursor: pointer;">
+							<i class="material-icons">assignment</i> The Project
+						</a>
+					</li>
+					<li>
+						<a href="{{ url_for ('compute')}}">
+							<i class="material-icons">dashboard</i> Compute
+						</a>
+					</li>
+					<li>
+						<a style="cursor: pointer;">
+							<i class="material-icons">code</i> The Code
+						</a>
+					</li>
+					<li>
+						<a style="cursor: pointer;">
+							<i class="material-icons">settings application</i> TSP
+						</a>
+					</li>
+
+		    	</ul>
+		    </div>
+		</div>
+	</nav>
+	<!-- End Navbar -->
+
+	<div class="wrapper">
+		<div class="header header-filter" style="background-image: url('static/cambridge.jpg');height: 380px;" ></div>
+		<div class="main main-raised">
+            <div class="container">    
+                <div class="section">
+			        <div class="container text-justify">
+			            <div class="row">
+			                <div class="col-md-8 col-md-offset-2 text-center">
+			                    <h2 align="center">Trip Description</h2 align="center">
+			                    <h4>Here are the details for your trip.
+			                    You can click on the tabs below to see place order, driving instructions and map.</h4>
+			                </div>
+			            </div>
+			            <div class="row" style="margin-top: 60px;">
+			            	<div class="col-md-8 col-md-offset-2 text-center">
+			            		<div class="profile-tabs">
+									<div class="nav-align-center has-info">
+										<ul class="nav nav-pills nav-pills-info" role="tablist" data-tabs="tabs">
+											<li class="active">
+												<a href="#profile" data-toggle="tab" aria-expanded="true">
+													<i class="material-icons">reorder</i>
+													Tour
+												<div class="ripple-container"></div></a>
+											</li>
+											<li class="">
+												<a id="directions-button" href="#directions-holder" data-toggle="tab" aria-expanded="false">
+													<i class="material-icons">directions</i>
+													Directions
+												<div class="ripple-container"></div></a>
+											</li>
+											<li class="">		
+												<a id="map-button" href="#maps" data-toggle="tab" aria-expanded="false">
+													<i class="material-icons">map</i>
+													Map
+												<div class="ripple-container"></div></a>
+											</li>
+										</ul>	
+									</div>		
+									<div class="tab-content text-center" style="margin-top: 45px;">
+										<div class="tab-pane active" id="profile">
+											<div class="card" align="left" style="padding-left: 15px; padding-top: 15px;">
+												<h4 style='color: #555; font-weight: 400; margin-bottom: 0px;'>
+												Here's the{% if duration %} fastest {% else %} shortest {% endif %}tour for you</h4>
+												<br>
+
+												<h5 style="font-size: 1.1em; margin-bottom: 0px; color: #555; font-weight: 400;"> You should travel to the places in the following order:</h5>
+												<p>
+													<ul >
+														{% for place in tour %}
+														<li style='color: #555; font-weight: 400;' > {{place}}</li>
+														{% endfor %}
+														</ul>
+													<font style='color: #555; font-weight: 400;'>The total{% if duration %} duration {% else %} distance {% endif %}is <b>{{distance}}</b>.
+													</font>
+												</p>
+											</div>
+										</div>
+										<div class="tab-pane" id="directions-holder" ">
+											<div class="card" id="directions"  align="left" style="overflow: auto; max-height: 500px; max-width: 750px; padding-left: 15px; padding-top: 15px;">
+											</div>	
+										</div>
+										<div class="tab-pane" id="maps"  >
+											<div class="card" id="map" style="min-width: 230px; height: 450px; max-width: 750px;">
+											</div>
+										<div>
+									</div>	
+								</div>
+							</div>
+						</div>
+					</div>
+            	</div>
+        	</div>
+		</div>
+		</div>
+		</div>
+		<footer class="footer">
+		    <div class="container">
+		         <nav class="pull-left">
+		            <ul>
+		            	<li>
+							<a href="http://cs50.harvard.edu" target="_blank">
+								CS50
+							</a>
+						</li>
+						<li>
+							<a href="http://www.creative-tim.com" target="_blank">
+								Creative Tim
+							</a>
+						</li>
+						<li>
+							<a href="https://developers.google.com/maps/" target="_blank">
+								Google Maps API
+							</a>
+						</li>
+					</ul>
+				</nav>
+		        <div class="copyright pull-right">
+		            Made with <i class="material-icons">favorite</i> by Jambay for CS50 thanks to Creative Tim and Google Maps API.
+		        </div>
+		    </div>
+		</footer>
+	</div>
+</body>
+
+   {% endblock %}

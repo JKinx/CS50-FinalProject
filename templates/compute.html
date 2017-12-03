@@ -1,0 +1,263 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Compute
+{% endblock %}
+
+{% block script %}
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDGREkJd-9YSBkOMdurnw-0gKxMCN1r4_g&libraries=places"
+        async defer></script>
+    <script src="{{ url_for('static', filename='compute.js') }}"></script>
+{% endblock %}
+
+{% block main %}
+
+<body class="components-page">
+
+<!-- Navbar -->
+<nav class="navbar navbar-info navbar-transparent navbar-fixed-top navbar-color-on-scroll">
+	<div class="container">
+        <div class="navbar-header">
+        	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-index">
+	        	<span class="sr-only">Toggle navigation</span>
+	        	<span class="icon-bar"></span>
+	        	<span class="icon-bar"></span>
+	        	<span class="icon-bar"></span>
+	    	</button>
+	    	<a href="http://www.facebook.com/jambay.k">
+	        	<div class="logo-container">
+	                <div class="logo" >
+	                    <img src="{{ url_for('static', filename='logo.jpg') }}" class="img-circle" rel="tooltip" title="<b>Let's Go</b> by Jambay. The web design template is courtesy of <b>Creative Tim</b>" data-placement="bottom" data-html="true">
+	                </div>
+	                <div class="brand">
+	                    Jambay Kinley
+	                </div>
+	         
+				</div>
+	      	</a>
+	    </div>
+
+	    <div class="collapse navbar-collapse" id="navigation-index">
+	    	<ul class="nav navbar-nav navbar-right">
+				<li>
+					<a style="cursor: pointer;">
+						<i class="material-icons">assignment</i> The Project
+					</a>
+				</li>
+				<li>
+					<a style="cursor: pointer;">
+						<i class="material-icons">dashboard</i> <b>Compute</b>
+					</a>
+				</li>
+				<li>
+					<a style="cursor: pointer;">
+						<i class="material-icons">code</i> The Code
+					</a>
+				</li>
+				<li>
+					<a style="cursor: pointer;">
+						<i class="material-icons">settings application</i> TSP
+					</a>
+				</li>
+
+	    	</ul>
+	    </div>
+	</div>
+</nav>
+<!-- End Navbar -->
+
+<div class="wrapper">
+	<div class="header header-filter" style="background-image: url('static/punakha.jpg');">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2">
+					<div class="brand">
+					<center>
+						<h1 style="color: white; font-size: 4.8em; font-weight: 600;">Let's Go</h1>
+						<h3 style="color: white; font-size: 1.5em; text-transform: uppercase; max-width: 400px;margin: 10px auto 0;">Planning your trip so you do not lose time on the travelling.</h3>
+					</center>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="main main-raised">
+		<div class="container">
+			<div class="section">
+		        <div class="container text-justify">
+		            <div class="row">
+		                <div class="col-md-8 col-md-offset-2 text-center">
+		                    <h2 align="center">Your Preferences</h2 align="center">
+		                    <h4>Please enter the places you want to go to. You will need to specify your starting place and end place or choose to use your starting place as your final destination. <br> You can choose to enter as many as eight places in between your start and end addresses.</h4>
+		                </div>
+		            </div>
+				</div>
+			</div>
+
+			<div class="section">
+				<div class="row">
+					<div class="col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
+						<div class="card card-signup">
+							<form id="form" class="form" method="post" action="{{ url_for('computed') }}">
+								<div class="header header-info text-center">
+									<br>
+										<h4>Let's Do This</h4>
+									</br>
+								</div>
+									
+					 			<div id="content" class="content">
+					 				
+					 				{% for message in get_flashed_messages() %}
+    									{{ message |safe }}
+  									{% endfor %}
+					 		
+									<p class="text-divider">Please enter your Start Address</p>
+									<div class="input-group" >
+										<span class="input-group-addon">
+											<i class="material-icons">place</i>
+										</span>
+										<div class="form-group is-empty" id="0_div">
+											<input type="text" class="form-control" id="0_input" placeholder="Address" onFocus="geolocate(this.id)"   placeholder="Starting Place...">
+											<input type="hidden" id="0" name="0">
+											
+										</div>
+									</div>
+
+									<p class="text-divider">Please enter your End Address</p>
+									<div class="input-group">
+										<div class="form-group">
+											<div class="togglebutton">
+												<label>
+													<input id="first-last" type="checkbox" name="first-last"> Use start address as end address
+												</label>
+											</div>
+										</div>
+									</div>
+									<div class="input-group" >
+										<span class="input-group-addon">
+											<i class="material-icons">place</i>
+										</span>
+										<div class="form-group is-empty" id="c_div">	
+											<input type="text" class="form-control" id="c_input" placeholder="Address"  onFocus="geolocate(this.id)"  placeholder="Final Place...">
+											<input type="hidden" id="c" name="c">
+											
+										</div>
+									</div>
+
+									<p class="text-divider">WayPoints</p>
+
+									<div class="input-group" style="width: 100%;">
+										<input type="hidden" id="waypoints" name="waypoints" value="0">
+										<div class="col-md-3">
+											<div class="form-group">
+												<p style="color: #555; font-weight: 400">
+												Number of Places
+												</p>
+											</div>
+
+										</div>
+										<div class="col-md-2">
+											<div class="form-group" style="margin-left: 0px;">
+												<select style="color: rgba(0,0,0, .54); font-weight: 400; width: 50%;" onchange="display_field(this)">
+													<option value="0" selected>0</option>
+													<option value="1">1</option>
+													<option value="2">2</option>
+													<option value="3">3</option>
+													<option value="4">4</option>
+													<option value="5">5</option>
+													<option value="6">6</option>
+													<option value="7">7</option>
+													<option value="8">8</option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div id="waypoints_holder" >
+									</div>
+
+									<p class="text-divider">Optimize by:</p>
+									<div class="input-group" style="width: 100%;">
+										<div class="col-md-3">
+											<div class="radio">
+												<label style="color: #555; font-weight: 400">
+													<input type="radio" name="optimizeBy" value="distance" checked="true">
+													<i class="material-icons">space_bar</i> 
+													Distance
+												</label>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="radio">
+												<label style="color: #555; font-weight: 400">
+													<input type="radio" name="optimizeBy" value="duration">
+													<i class="material-icons">access_time</i>
+													Duration
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="footer text-center">
+									<button type="submit" class="btn btn-simple btn-info btn-lg" id="submit">Compute</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+		    </div>
+				
+		</div>
+	</div>
+
+	<footer class="footer">
+	    <div class="container">
+	         <nav class="pull-left">
+	            <ul>
+	            	<li>
+						<a href="http://cs50.harvard.edu" target="_blank">
+							CS50
+						</a>
+					</li>
+					<li>
+						<a href="http://www.creative-tim.com" target="_blank">
+							Creative Tim
+						</a>
+					</li>
+					<li>
+						<a href="https://developers.google.com/maps/" target="_blank">
+							Google Maps API
+						</a>
+					</li>
+				</ul>
+			</nav>
+				
+
+	        <div class="copyright pull-right">
+	            Made with <i class="material-icons">favorite</i> by Jambay for CS50 thanks to Creative Tim and Google Maps API.
+	        </div>
+	    </div>
+	</footer>
+
+</div>
+
+
+</body>
+
+	{% for message in get_flashed_messages() %}
+			<script>
+			console.log("{{message}}");
+			if ("{{message}}" != undefined ) {
+
+				$('html, body').animate({
+	                scrollTop: ($("#content").offset().top - 250)
+	            }, 5);
+			}
+			</script>
+	{% endfor %}
+
+{% endblock %}
+
+
+	

@@ -1,0 +1,67 @@
+The Traveling Salesman Problem:
+The traveling salesman problem (TSP) according to Wikipedia is an optimization problem which asks: "Given a list of cities and the distances between each pair of cities, what is the shortest possible route that visits each city exactly once and returns to the origin city?”.
+The TSP is a NP-hard problem which means that it cannot be solved in polynomial time (n, nlog(n), n^2, etc). The most obvious way to solve the problem would be to look at all the possible permutation of place order and find the one with the shortest distance value. However, the runtime for this is O(n!) where n is the number of cities. Although this does not affect the total runtime much when n is relatively small, it gets very high very soon. For example, n! is 120 for 5, 720 for 6 and 5040 for 7.
+The approach to solving TSP in my project that I used is dynamic programming which changes the runtime to O(n^2*2^n) which is exponential but less than n! for larger values of n.
+https://github.com/evandrix/SPOJ/blob/master/DP_Main112/Solving-Traveling-Salesman-Problem-by-Dynamic-Programming-Approach-in-Java.pdf has good information about how the dynamic program for this particular solution work.
+For the actual implementation, I explored several options including implementing one myself but I ultimately decided to use a python version of the dynamic programming solution found on https://mchouza.wordpress.com/2010/11/21/solving-the-travelling-salesman-problem/ which uses a recursive algorithm to do the same.
+This works essentially by not checking all possible permutations and instead, coming from the smallest set, finding the best permutation for it and using it on the next level, ultimately reaching the complete set.
+This particular approach also affords using a place other than the starting place as the final destination.
+
+I would like to note that while the optimization problem could also have been solved through Google Map DirectionsService simply by adding a value optimize=true in the directionsService.route() API call, I wanted to deal with the TSP on a much lower level by actually implementing a solution to it albeit not an original solution by myself. This in turn allowed me to be able to offer optimization by duration as well as distance.
+
+
+Server-Side Application:
+The website is hosted by flask on port 2525 of the user’s computer.
+The server side implementation has two files: application.py and helpers.py which together run the website. 
+Their implementations relies on the fact that the form provides all the necessary values for the computations through field values.
+
+helpers.py
+helpers.py has three functions: get_info, tsp_rec_solve and render_computed.
+
+get_info takes three parameters- places: the url for the API call, number: total number of places and optimizeBy: distance/duration.
+Using the Google Maps Distance Matrix API, it then creates an adjacency matrix (which is a two dimensional array storing distance/duration between pairs of places) and a list of place names stored in the same order as in the adjacency matrix.
+
+The results of get_info are passed to tsp_rec_solve which takes two other parameters called end (0 for final destination same as start place and 1 otherwise) and optimizeBy.
+The first part of this function solves the TSP adjacency matrix and returns the order of waypoints as a tuple in best_tour. With this tuple and some other variables, it uses the information available to return a list of the place names in the optimal order as best_route, a list of waypoints names in order as waypoints and the total distance/time as a formatted string.
+Although, I could have avoiding having multiple iterations of essentially the same values and gotten the necessary results in the first iteration through best_tour, I decided on using another variable called best_combo for the sake of not complicating the initial loop.
+
+render_computed does the complete processing of user input, doing the computations and rendering the /computed route. It obtains the necessary values for the form, completes the url for the API call, and uses the information from get_info and tsp_rec_solve to pass some variables while rendering computed.html. computed.html uses jinja to display the parameters passed to it as html contents.
+Initially I had the contents of render_computed as parts of both the if and else block for the POST method of /computed route in application.py but I decided that creating a separate function would be better since the code was almost similar for both conditions and the differences could be adjusted by using the parameter c_value.
+
+application.py
+application.py handles routing and rendering correct pages.
+/compute only has a GET method. I could have made the form in it submit to itself and handle the request through POST but I thought submitting to a separate url /computed was more practical.
+The actual page at /computed is only accessible through a POST request. It redirects the user to /computed if otherwise.
+
+The ‘if "c" in request.form:’ condition is used due to my decision to treat the cases where the starting place and final destination are same and where they are different as distinct occurrences. This could have been avoided by simply treating the final destination as the last place in the list in both cases. Although this does lead to simpler code, it leads to redundancy in the adjacency matrix and API call in the case of the starting place and final destination being same. So I decided to treat them different for faster  runtime (albeit unnoticeable) and more efficient use of the API query quota.
+
+
+Client-side:
+I used the Material Kit free version from Creative Kit with some modifications for the overall design of the webpages. 
+
+compute.html has a form in it. Some of the required fields are displayed on load while additional fields can be added by selecting the number of waypoints.
+Inorder to use the distance matrix API in the backend efficiently, I opted to use place ids for the places which were obtained from the autocomplete API and stored in hidden inputs fields. 
+This page includes compute.js which implements the autocomplete feature for entering place addresses and does the form validation and insertion of new fields.
+
+compute.js:
+The geolocate function gets called every time an address field is focused. This triggers the autocomplete function to provide place suggestions while creating an autocomplete object. It also has a function inside it that obtains the current position of the user and focuses the results around that. However, this feature works only when the website is visited over an https connection.
+the “place_changed” event listener which is triggered when the user selects an option or enters a new address changes the message the message displayed above the field depending on whether a recognized address was entered or not. Some conditions inside this function check the current conditions of the form and makes appropriate changes to the html. It also changes the truth conditions of the holder and second variables which are used to validate the form.
+
+I used the variables holder and second to keep track of whether valid address were put or not before submit the form. second tracks the condition of the input field for final destination. holder which is a list tracks the condition of the starting place (index 0) and other address fields. It original has only the first elements. The other elements are added/refreshed when number of waypoints is selected/changed. I chose to use this variables over checking the html on form submission as they were easier to access and manipulate.
+
+There are some even listeners too which perform various functions. $("#first-last").on('change' enables and disables the input field for final destination by manipulating the html. While disabled, the field for final destination and the variable second take on the the same values as staring place and holder[0].
+Form submission on pressing enter is disabled.
+The last event listener validates the form using the holder and second variables. If there is any unrecognized field, the form fails to submit and the document gets scrolled to show the first invalid input. 
+
+computed.html displays the results of the computation in three tabs which are empty divs in the template.
+The contents of the tour tab are entered by jinja using the variables passed through render template while those for the directions and maps panes are entered by javascript imported from computed.js.
+
+computed.js:
+the initMap function is supported by calculateAndDisplayRoute and insertDirections functions.
+initMap initially initializes the map in the tab pane for map and has two event listeners for listening for the Directions or Maps tabs being clicked. On either of them being clicked for the first time (tracked using first-load) calculateAndDisplayRoute obtains the directions, sets them on the map and enters them in the direction tab. On subsequent clicks, the directions are set only on the map and the map is then resized.
+Entering directions in the Directions tab is done by manipulating the html of the div container “directions” using jQuery.
+
+I would also like to note that I have used jQuery and standard javascript together without any particular pattern.
+
+The other css and javascript are courtesy of Creative Tim. I have however made some modifications to the css files.
+
