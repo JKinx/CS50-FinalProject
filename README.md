@@ -1,9 +1,11 @@
 **Description**
+
 Do you have many places to visit but don’t know how to plan your trip? Do you want to save travel distance? Or time? Lets go gives you the ability to plan your optimal trip and you can optimize it by duration or time.
 
 The program uses a set of Google Maps API and some clever algorithm to find you your optimal trip along with directions and a map so that you should only worry about getting yourself in a car and enjoy the trip.
 
 **Requirements:**
+
 Python 3.5
 A Google Maps API key
 
@@ -33,6 +35,7 @@ The website has a few pages which have information about the project.
 The actual tour solving is implemented in the /compute path of the website which can be accessed by putting that path into the web address or clicking on the Compute link at the top of the web page.
 
 **Compute**
+
 The /compute page essentially has a form with fields where you put in your preferences.
 Two fields are absolutely necessary to be filled: the starting place and either “Use starting position as final destination” toggle or final destination address.
 You can also select up to eight places you would like to visit during the tour in between the start and end places.
@@ -46,6 +49,7 @@ If you entered a correct address also displayed in the options but the form does
 Most importantly, only enter places that are possible to be visited by driving. Since the program currently optimizes a driving tour, it cannot compute the tour for places inaccessible to one another by driving.
 
 **Computed**
+
 If all the required fields were entered as per requirements, the page will be redirected to /computed where the results will be displaced.
 The result is displayed in three parts: Tour, Directions, Map.
 Tour displays the order in which to travel to the places you entered. It is the fastest tour if optimized by duration and shortest if optimized by distance. It also gives an approximation for the total duration/duration for the tour.
