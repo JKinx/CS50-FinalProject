@@ -4,6 +4,7 @@ Do you have many places to visit but don’t know how to plan your trip? Do you 
 
 The program uses a set of Google Maps API and some clever algorithm to find you your optimal trip along with directions and a map so that you should only worry about getting yourself in a car and enjoy the trip.
 
+
 **Requirements:**
 
 Python 3.5
@@ -34,6 +35,7 @@ Load http://0.0.0.0:2525/compute on your web browser.
 The website has a few pages which have information about the project.
 The actual tour solving is implemented in the /compute path of the website which can be accessed by putting that path into the web address or clicking on the Compute link at the top of the web page.
 
+
 **Compute**
 
 The /compute page essentially has a form with fields where you put in your preferences.
@@ -47,6 +49,7 @@ On submitting the form, if any unrecognized address was entered, the form does n
 While entering place, please select an address from the lists of options displayed. The form does not recognize the address if it is not selected from the options displayed.
 If you entered a correct address also displayed in the options but the form doesn’t show the green success message, please delete some part of the address and select the appropriate address from the options.
 Most importantly, only enter places that are possible to be visited by driving. Since the program currently optimizes a driving tour, it cannot compute the tour for places inaccessible to one another by driving.
+
 
 **Computed**
 
